@@ -95,7 +95,7 @@ library(ggplot2)
 storm_plot <- ggplot(mergestorm, aes(x=area, y=Freq))+
    geom_point(aes(color=region))+
      labs(x ="Land area(square miles)",
-          y = "# of storm events in 2017")
+          y = "# of storm events in 1998")
 storm_plot
 ```
 
