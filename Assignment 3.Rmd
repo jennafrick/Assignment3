@@ -1,0 +1,105 @@
+---
+title: "Assignment 3"
+author: "Jenna Frick"
+date: "2022-09-28"
+output: html_document
+---
+
+```{r setup, include = FALSE}
+library(tidyverse)
+library(dplyr)
+library(stringr)
+```
+
+```{r read, include = FALSE}
+#import the data
+stormevents <- read_csv('StormEvents.csv')
+```
+
+
+```{r variables, include = FALSE}
+#create new subset 
+variables <- c("BEGIN_YEARMONTH", "BEGIN_DATE_TIME", "END_DATE_TIME", "EPISODE_ID", "EVENT_ID", "STATE", "STATE_FIPS", "CZ_NAME", "CZ_TYPE", "CZ_FIPS", "EVENT_TYPE", "SOURCE", "BEGIN_LAT", "BEGIN_LON", "END_LAT", "END_LON")
+
+newstorm <- stormevents[variables]
+```
+
+
+```{r arrange, include = FALSE}
+#arrange data by being_yearmonth
+arrange(newstorm, BEGIN_YEARMONTH)
+
+```
+
+```{r capitalize, include = FALSE}
+
+#capitalize the first word
+str_to_title(newstorm$STATE)
+str_to_title(newstorm$CZ_NAME)
+```
+
+
+
+```{r filter, include = FALSE}
+#filter
+newstormc <- newstorm %>% filter(CZ_TYPE=="C")
+newstorm2 <- newstormc %>% subset(select= -c(CZ_TYPE))
+```
+
+```{r padstate, include = FALSE}
+#pad and unite columns 
+str_pad(newstorm2$STATE_FIPS, width= 3, side="left", pad="0")
+str_pad(newstorm2$CZ_FIPS, width= 3, side="left", pad="0")
+newstorm3 <- unite(newstorm2, "FIPS", c(STATE_FIPS, CZ_FIPS), sep="")
+```
+
+```{r rename, include = FALSE}
+#rename to lower
+newstorm4 <- rename_all(newstorm3, tolower)
+```
+
+```{r state, include = FALSE}
+#state data
+data("state")
+us_state_info<-data.frame(state=state.name, region=state.region, area=state.area)
+
+```
+
+
+```{r newstate, include = TRUE}
+#state data
+newset <- data.frame(table(newstorm4$state))
+
+```
+
+
+```{r newname, include = FALSE}
+#rename data
+newset1 <-rename(newset, c(state="Var1"))
+```
+
+```{r usdata, include = FALSE}
+#mutate data
+us_state_info1 <- mutate_all(us_state_info, toupper)
+```
+
+
+```{r merge, include = TRUE}
+#merge data
+mergestorm <- merge(x=newset1,y=us_state_info1, by.x="state", by.y="state")
+```
+
+```{r graph, include = TRUE}
+#graph data
+library(ggplot2)
+storm_plot <- ggplot(mergestorm, aes(x=area, y=Freq))+
+   geom_point(aes(color=region))+
+     labs(x ="Land area(square miles)",
+          y = "# of storm events in 2017")
+storm_plot
+```
+
+
+
+
+
